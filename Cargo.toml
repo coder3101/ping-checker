@@ -1,0 +1,18 @@
+[package]
+name = "ping-checker"
+version = "0.1.0"
+edition = "2024"
+description = "A simple web server that checks the reachability of a host via ping."
+license = "MIT"
+authors = ["Ashar"]
+
+[package.metadata.deb]
+maintainer-scripts = "debian/"
+systemd-units = { enable = false }
+
+[dependencies]
+axum = "0.8.4"
+ping-rs = "0.1.2"
+tokio = { version = "1.47.1", features = ["full"] }
+tracing = "0.1.41"
+tracing-subscriber = "0.3.20"

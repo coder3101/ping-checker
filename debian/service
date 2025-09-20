@@ -1,0 +1,8 @@
+[Unit]
+Description=Ping Checker
+
+[Service]
+ExecStart=/usr/bin/ping-checker
+
+[Install]
+WantedBy=multi-user.target
