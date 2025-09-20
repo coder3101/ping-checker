@@ -1,6 +1,7 @@
-use std::{net::IpAddr, sync::Arc, time::Duration};
+use std::{net::IpAddr, time::Duration};
 
 use axum::{Router, extract::Path, http::StatusCode, routing::get};
+use ping_async::IcmpEchoRequestor;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,9 +19,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn perform_ping(Path(ip): Path<String>) -> Result<(), StatusCode> {
-    let data = [1, 2, 3, 4]; // ping data
-    let data_arc = Arc::new(&data[..]);
-
     let ip: IpAddr = ip.parse().map_err(|e| {
         tracing::warn!(err=%e, "perform_ping: invalid IP address");
         StatusCode::BAD_REQUEST
@@ -28,7 +26,12 @@ async fn perform_ping(Path(ip): Path<String>) -> Result<(), StatusCode> {
 
     tracing::debug!("Pinging {ip}");
 
-    if let Err(e) = ping_rs::send_ping_async(&ip, Duration::from_secs(2), data_arc, None).await {
+    let pp = IcmpEchoRequestor::new(ip, None, None, Some(Duration::from_secs(2))).map_err(|e| {
+        tracing::warn!(err=?e, "perform_ping: failed to create ping requestor");
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    if let Err(e) = pp.send().await {
         tracing::warn!(err=?e, "perform_ping: ping failed");
         return Err(StatusCode::SERVICE_UNAVAILABLE);
     }

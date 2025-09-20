@@ -2,6 +2,7 @@
 
 A lightweight HTTP service that performs ping connectivity checks via a REST API. This service is designed to be used by remote hosts (such as Tailscale nodes) to perform connectivity checks to homelab or other network destinations.
 
+> Requires `net.ipv4.ping_group_range` sysctl parameter to allow unprivileged ICMP sockets. Check with: `sysctl net.ipv4.ping_group_range`
 ## Features
 
 - Simple REST API for ping operations
